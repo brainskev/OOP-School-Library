@@ -49,20 +49,10 @@
 
 ### Key Features <a name="key-features"></a>
 
-> Describe between 1-3 key features of the application.
-
 - **IRB**
 - **Use Gems to test for linters**
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-<!-- LIVE DEMO -->
-<!--
 
-## 🚀 Live Demo <a name="live-demo"></a>
-
-> Add a link to your deployed project.
-
-- [Live Demo Link](https://yourdeployedapplicationlink.com)
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- GETTING STARTED -->
 
 ## 💻 Getting Started <a name="getting-started"></a>
@@ -181,12 +171,6 @@ If you like this project, please leave a star.
 I would like to thank Microverse for providing me with the necessary reading materials that have aided me during project development.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- FAQ (optional) -->
-
-## ❓ FAQ <a name="faq"></a>
-
-> Add at least 2 questions new developers would ask when they decide to use your project.
 
 - **Can I use this code?**
   - Sure! It's open source, feel free to fork it.
