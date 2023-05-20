@@ -9,9 +9,9 @@ def list_books
 end
 
 def list_people
-    puts 'List of people:'
-    @people.each { |person| puts "[#{person.class}] Name: #{person.name}, ID: #{person.id}, Age: #{person.age}" }
-  end  
+  puts 'List of people:'
+  @people.each { |person| puts "[#{person.class}] Name: #{person.name}, ID: #{person.id}, Age: #{person.age}" }
+end
 
 # rubocop:disable Metrics/MethodLength
 def create_person
