@@ -1,142 +1,87 @@
-require_relative 'student'
 require_relative 'teacher'
+require_relative 'student'
 require_relative 'book'
 require_relative 'rental'
 
-def list_books
-  puts 'List of books:'
-  @books.each { |book| puts "Title: \"#{book.title}\", Author: #{book.author}" }
-end
-
-def list_people
-  puts 'List of people:'
-  @people.each { |person| puts "[#{person.class}] Name: #{person.name}, ID: #{person.id}, Age: #{person.age}" }
-end
-
-# rubocop:disable Metrics/MethodLength
-def create_person
-  print 'Do you want to create a student (1) or a teacher (2)? [Input the number]: '
-  person_type = gets.chomp
-
-  if person_type != '1' && person_type != '2'
-    puts 'Invalid option'
-    return
+class App
+  def initialize
+    @books = []
+    @people = []
   end
 
-  print 'Age: '
-  age = gets.chomp
-
-  print 'Name: '
-  name = gets.chomp
-
-  case person_type
-  when '1'
-    print 'Has parent permission? [Y/N]: '
-    parent_permission = gets.chomp
-    parent_permission = parent_permission.downcase == 'y'
-
-    person = Student.new(age, name: name, parent_permission: parent_permission)
-
-  when '2'
-    print 'Specialization: '
-    specialization = gets.chomp
-
-    person = Teacher.new(age, specialization: specialization, name: name)
+  def list_all_books
+    @books.each do |book|
+      puts "Title: #{book.title}   Author: #{book.author}"
+    end
   end
 
-  @people << person
-
-  puts 'Person created successfully'
-end
-# rubocop:enable Metrics/MethodLength
-
-def create_book
-  print 'Title: '
-  title = gets.chomp
-
-  print 'Author: '
-  author = gets.chomp
-
-  @books << Book.new(title, author)
-  puts 'Book created successfully'
-end
-
-def create_rental
-  puts 'Select a book from the following list by number'
-  @books.each_with_index { |book, index| puts "#{index}) Title: \"#{book.title}\", Author: #{book.author}" }
-  book_index = gets.chomp.to_i
-
-  puts
-
-  puts 'Select a person from the following list by number (not id)'
-  # rubocop:disable Metrics/LineLength
-  @people.each_with_index { |person, index| puts "#{index}) [#{person.class}] Name: #{person.name}, ID: #{person.id}, Age: #{person.age}" }
-  person_index = gets.chomp.to_i
-  # rubocop:enable Metrics/LineLength
-
-  puts
-
-  print 'Date: '
-  date = gets.chomp
-
-  @rentals << Rental.new(date, @books[book_index], @people[person_index])
-  puts 'Rental created successfully'
-end
-
-def list_rentals_for_person_id
-  print 'ID of person: '
-  id = gets.chomp.to_i
-
-  puts 'Rentals:'
-  @rentals.each do |rental|
-    puts "Date: #{rental.date}, Book \"#{rental.book.title}\" by #{rental.book.author}" if rental.person.id == id
+  def list_all_people
+    @people.each do |person|
+      puts "[#{person.class.name}] Name: #{person.name} ID: #{person.id} Age: #{person.age}"
+    end
   end
-end
 
-# rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity
-def main
-  @books = []
-  @people = []
-  @rentals = []
+  def create_person(type)
+    age = prompt_input('Age:').to_i
+    name = prompt_input('Name:')
+    specialization = type.downcase == 'teacher' ? prompt_input('Specialization:') : nil
+    parent_permission = prompt_yes_no('Has parent permission?')
 
-  puts ''
-  puts 'Welcome to School Library App'
-  puts ''
-
-  option = nil
-
-  while option != '7'
-    puts 'Please choose an option by entering a number:'
-    puts '1 - List all books'
-    puts '2 - List all people'
-    puts '3 - Create a person'
-    puts '4 - Create a book'
-    puts '5 - Create a rental'
-    puts '6 - List all rentals for a given person id'
-    puts '7 - Exit'
-
-    option = gets.chomp
-
-    case option
-    when '1'
-      list_books
-    when '2'
-      list_people
-    when '3'
-      create_person
-    when '4'
-      create_book
-    when '5'
-      create_rental
-    when '6'
-      list_rentals_for_person_id
+    case type.downcase
+    when 'teacher'
+      @people << Teacher.new(age, specialization, name: name, parent_permission: parent_permission)
+    when 'student'
+      @people << Student.new(age, name: name, parent_permission: parent_permission)
+    else
+      puts "Invalid person type: #{type}"
+      return
     end
 
-    puts
+    puts "#{type.capitalize} created successfully!"
   end
 
-  puts 'Thank you for using this app!'
-end
-# rubocop:enable Metrics/MethodLength, Metrics/CyclomaticComplexity
+  def create_book
+    title = prompt_input('Title:')
+    author = prompt_input('Author:')
+    @books << Book.new(title, author)
+    puts 'Book created successfully!'
+  end
 
-main
+  def create_rental
+    puts 'Select a book from the following list by number'
+    @books.each.with_index { |book, idx| puts "#{idx}) Book #{book.title} by #{book.author}" }
+    book_index = gets.chomp.to_i
+    puts 'Select a person from the following list by number (not ID)'
+    @people.each.with_index do |person, idx|
+      puts "#{idx}) [#{person.class.name}] Name: #{person.name}, ID: #{person.id}, Age: #{person.age}"
+    end
+    person_index = gets.chomp.to_i
+    puts 'Date:'
+    date = gets.chomp
+    Rental.new(date, @books[book_index], @people[person_index])
+    puts 'Rental created successfully!'
+  end
+
+  def list_person_rentals(person_id)
+    person = @people.find { |p| p.id == person_id }
+
+    if person
+      puts 'Rentals:'
+      person.rental.each do |rental|
+        puts "Date: #{rental.date}, Book: \"#{rental.book.title}\" by #{rental.book.author}"
+      end
+    else
+      puts 'Person not found!'
+    end
+  end
+
+  def prompt_yes_no(message)
+    val = prompt_input("#{message} (Y/N)").downcase
+    %w[y yes].include?(val)
+  end
+end
+
+def prompt_input(message)
+  puts message
+  gets.chomp
+end
